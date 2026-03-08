@@ -11,6 +11,8 @@ struct ListItem {
 struct List {
   struct ListItem *front;
   struct ListItem *back;
+  size_t listSize;
+  char isInitilazied;
   void *(*pushBack)(struct List *, void *);
   int (*popBack)(struct List *);
   void (*clear)(struct List *);
@@ -39,6 +41,7 @@ char ListIsEmpty(struct List *this) {
 }
 
 void *ListPushBack(struct List *this, void *p) {
+  this->listSize++;
 
   if (p == NULL)
     return NULL;
@@ -70,6 +73,7 @@ void *ListPushBack(struct List *this, void *p) {
 void *ListPushFront(struct List *this, void *p) {
   if (p == NULL)
     return NULL;
+  this->listSize++;
   if (this->isEmpty(this)) {
     struct ListItem *item = malloc(sizeof(struct ListItem));
     if (item == NULL)
@@ -98,6 +102,7 @@ int ListPopBack(struct List *this) {
   if (!this->back)
     return 1;
 
+  this->listSize--;
   free(this->back->value);
   if (this->back->prev == NULL) {
     free(this->back);
@@ -117,6 +122,7 @@ int ListPopFront(struct List *this) {
   if (!this->front)
     return 1;
 
+  this->listSize++;
   free(this->front->value);
   if (this->front->next == NULL) {
     free(this->front);
@@ -131,15 +137,7 @@ int ListPopFront(struct List *this) {
   return 0;
 }
 
-size_t ListSize(struct List *this) {
-  size_t size = 0;
-  struct ListItem *cur = this->front;
-  while (cur) {
-    size++;
-    cur = cur->next;
-  }
-  return size;
-}
+size_t ListSize(struct List *this) { return this->listSize; }
 
 void ListClear(struct List *this) {
   while (!this->isEmpty(this)) {
@@ -154,7 +152,7 @@ void ListDtor(struct List *this) {
 }
 
 void ListCtor(struct List *this) {
-  if (this->isEmpty != NULL)
+  if (this->isInitilazied)
     return;
   this->front = NULL;
   this->back = NULL;
@@ -166,6 +164,7 @@ void ListCtor(struct List *this) {
   this->clear = ListClear;
   this->pushFront = ListPushFront;
   this->popFront = ListPopFront;
+  this->isInitilazied = 1;
 }
 
 int main(void) {
