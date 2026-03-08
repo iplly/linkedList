@@ -12,7 +12,6 @@ struct List {
   struct ListItem *front;
   struct ListItem *back;
   size_t listSize;
-  char isInitilazied;
   void *(*pushBack)(struct List *, void *);
   int (*popBack)(struct List *);
   void (*clear)(struct List *);
@@ -122,7 +121,7 @@ int ListPopFront(struct List *this) {
   if (!this->front)
     return 1;
 
-  this->listSize++;
+  this->listSize--;
   free(this->front->value);
   if (this->front->next == NULL) {
     free(this->front);
@@ -152,10 +151,9 @@ void ListDtor(struct List *this) {
 }
 
 void ListCtor(struct List *this) {
-  if (this->isInitilazied)
-    return;
   this->front = NULL;
   this->back = NULL;
+  this->listSize = 0;
   this->pushBack = ListPushBack;
   this->print = ListPrint;
   this->popBack = ListPopBack;
@@ -164,7 +162,6 @@ void ListCtor(struct List *this) {
   this->clear = ListClear;
   this->pushFront = ListPushFront;
   this->popFront = ListPopFront;
-  this->isInitilazied = 1;
 }
 
 int main(void) {
